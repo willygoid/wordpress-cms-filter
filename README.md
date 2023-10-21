@@ -1,6 +1,10 @@
 # Overview :
 This tool was created to make it easier to filter websites that use wordpress cms quickly and massively based on the list of websites provided. It is made using python 3 with a threading system to speed up the performance of the filtering program.
 
+## Preview
+
+![My Image](/wp-filter_preview.png)
+
 ## Features
 - Simple
 - Lightweight
@@ -28,16 +32,12 @@ python wp-filter.py
 | Sitelist | Enter your website list to scan in format txt |
 | Thread | Enter value threading (default 1000) |
 
-## Preview
-
-![My Image](/wp-filter_preview.png)
-
-
 ## License
 
 MIT
 
 ## Keyword
 Bulk Wordpress CMS Filter | Mass Wordpress CMS Filter | WP CMS Filter | Wordpress CMS Detect | Wordpress CMS Detect 
+
 
 > Note: `This tool was created only for educational purposes and to help make work easier, we do not accept illegal usage.`
