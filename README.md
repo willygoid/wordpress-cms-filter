@@ -30,7 +30,7 @@ python wp-filter.py
 
 ## Preview
 
-![My Image](/wp-filter_preview.pngg)
+![My Image](/wp-filter_preview.png)
 
 
 ## License
