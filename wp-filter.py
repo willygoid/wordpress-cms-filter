@@ -1,7 +1,6 @@
 import threading
 import time, os
 import requests
-from tqdm import tqdm
 
 if os.name == "nt":
 	os.system("cls")
@@ -39,10 +38,7 @@ def save(url):
 
 def resolveDns(hostnames):
     ua = {'User-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36'}
-    for host in tqdm(hostnames):
-        pbar = tqdm(total = len(hostnames))
-        print(pbar)
-        exit()
+    for host in hostnames:
         try:
             if "http" not in host:
                 checkHost = "http://" + host
