@@ -26,9 +26,9 @@ print(bcolors.OKCYAN + """
 """ + bcolors.ENDC)
 
 sitelist = input("Sitelist : ")
-threadp = input("Thread (default: 100): ")
+threadp = input("Thread (default: 1000): ")
 if threadp == '' or type(threadp) != int:
-    threadp = 100
+    threadp = 1000
     
 #url_list = open(sitelist,"r").read().splitlines()
 
