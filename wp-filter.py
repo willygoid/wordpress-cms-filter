@@ -1,8 +1,7 @@
-import requests
-from requests.sessions import Session
+import threading
 import time, os
-from threading import Thread,local
-from queue import Queue
+import requests
+from tqdm import tqdm
 
 if os.name == "nt":
 	os.system("cls")
@@ -21,66 +20,70 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 print(bcolors.OKCYAN + """
- [#] Wordpress CMS Filter
+ [#] Domain to IP
  [#] Coded by @willygoid
  [#] www.haxor.id
 """ + bcolors.ENDC)
 
 sitelist = input("Sitelist : ")
-threadp = input("Thread (default: 1000): ")
+threadp = input("Thread (default: 100): ")
 if threadp == '' or type(threadp) != int:
-    threadp = 1000
+    threadp = 100
     
-url_list = open(sitelist,"r").read().splitlines()
-q = Queue(maxsize=0)            #Use a queue to store all URLs
-
-for url in url_list:
-    if url is None:
-        url = "http://example.com"
-    if "http" not in url:
-        url = "http://" + url
-    q.put(url)
-thread_local = local()          #The thread_local will hold a Session object
-
-def get_session() -> Session:
-    if not hasattr(thread_local,'session'):
-        thread_local.session = requests.Session() # Create a new Session if not exists
-    return thread_local.session
+#url_list = open(sitelist,"r").read().splitlines()
 
 def save(url):
     print(bcolors.OKGREEN + "WordPress ---> " + bcolors.ENDC + url)
     with open("wordpress.txt","a") as f:
         f.write(url + "\n")
-        
-def download_link() -> None:
-    '''download link worker, get URL from queue until no url left in the queue'''
-    session = get_session()
+
+def resolveDns(hostnames):
     ua = {'User-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36'}
-    while True:
-        url = q.get()
-        urlCheck = url + '/license.txt'
+    for host in tqdm(hostnames):
+        pbar = tqdm(total = len(hostnames))
+        print(pbar)
+        exit()
         try:
-            response = session.get(urlCheck,headers=ua,timeout=1)
-            if response.status_code < 403:
-                save(url)
+            if "http" not in host:
+                checkHost = "http://" + host
+            
+            urlCheck = checkHost + '/license.txt'
+            response = requests.get(urlCheck,headers=ua,timeout=5)
+            if response.status_code < 400:
+                if 'WordPress - Web publishing software' in response.text:
+                    save(host)
+                else:
+                    print(bcolors.WARNING + "Not WordPress ---> " + bcolors.ENDC + host)
             else: 
-                print(bcolors.WARNING + "Not WordPress ---> " + bcolors.ENDC + url)
-        except:
-            print(bcolors.FAIL + "Not working ---> " + bcolors.ENDC + url)
-            #print(f'Read {response.status_code} from {url}')
-        q.task_done()          # tell the queue, this url downloading work is done
+                print(bcolors.WARNING + "Not WordPress ---> " + bcolors.ENDC + host)
+            
+        except Exception as e:
+            print(bcolors.FAIL + "Not working ---> " + bcolors.ENDC + host)
+            continue
 
-def download_all(urls) -> None:
-    '''Start 10 threads, each thread as a wrapper of downloader'''
-    thread_num = threadp
-    for i in range(thread_num):
-        t_worker = Thread(target=download_link)
-        t_worker.start()
-    q.join()                   # main thread wait until all url finished downloading
+if __name__ == "__main__":
+    
+    with open(sitelist) as file:
+        hostnames = file.readlines()
+        hostnames = [line.rstrip() for line in hostnames]
+    
+    print(bcolors.OKPURPLE + "===[ Start Work ]==="+ bcolors.ENDC)
+    start = time.time()
+    
+    threads = list()
 
-print(bcolors.OKPURPLE + "===[ Start Work ]==="+ bcolors.ENDC)
-start = time.time()
-download_all(url_list)
-end = time.time()
-print("")
-print(f'{bcolors.OKCYAN}Finished {len(url_list)} links in {end - start} seconds {bcolors.ENDC}')
+    chunksize = threadp
+
+    chunks = [hostnames[i:i + chunksize] for i in range(0, len(hostnames), chunksize)]
+    for chunk in chunks:
+        x = threading.Thread(target=resolveDns, args=(chunk,))
+        threads.append(x)
+        x.start()
+
+    for chunk, thread in enumerate(threads):
+        thread.join()
+
+    end = time.time()
+    duration = end - start
+    print(" ")
+    print(f'{bcolors.OKCYAN}Finished {len(sitelist)} links in {duration} seconds {bcolors.ENDC}')
