@@ -64,8 +64,8 @@ def resolveDns(hostnames):
 if __name__ == "__main__":
     
     with open(sitelist) as file:
-        hostnames = file.readlines()
-        hostnames = [line.rstrip() for line in hostnames]
+        hostnames = (line.rstrip() for line in file) 
+        hostnames = list(line for line in hostnames if line)
     
     print(bcolors.OKPURPLE + "===[ Start Work ]==="+ bcolors.ENDC)
     start = time.time()
@@ -86,4 +86,4 @@ if __name__ == "__main__":
     end = time.time()
     duration = end - start
     print(" ")
-    print(f'{bcolors.OKCYAN}Finished {len(sitelist)} links in {duration} seconds {bcolors.ENDC}')
+    print(f'{bcolors.OKCYAN}Finished {len(hostnames)} links in {duration} seconds {bcolors.ENDC}')
